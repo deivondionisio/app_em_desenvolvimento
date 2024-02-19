@@ -1,41 +1,41 @@
-const Sequelize = require('sequelize');
-const config = require('../config/database');
+const { Model, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize(config.development.database, config.development.username, config.development.password, {
-  host: config.development.host,
-  dialect: 'postgres',
-});
+// Define a classe Usuario que estende Model.
+class Usuario extends Model {}
 
-class UsuarioModel extends Sequelize.Model {}
+// Exporta uma função que recebe a instância do Sequelize e define o modelo.
+module.exports = (sequelize) => {
+  Usuario.init({
+    // Define os campos do modelo com seus tipos de dados e regras.
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    nome: {
+      type: DataTypes.STRING(255), // Ajustado para corresponder ao diagrama ER
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING(255), // Ajustado para corresponder ao diagrama ER
+      allowNull: false,
+      unique: true
+    },
+    senha: {
+      type: DataTypes.STRING, // Não especifica o comprimento, ajuste conforme necessário.
+      allowNull: false
+    },
+    unidade: {
+      type: DataTypes.INTEGER, // Ajustado para corresponder ao tipo no diagrama ER
+      allowNull: false
+    }
+  }, {
+    sequelize, // Passa a instância do Sequelize.
+    modelName: 'Usuario', // O nome do modelo em formato PascalCase.
+    freezeTableName: true, // Impede que o Sequelize pluralize o nome da tabela.
+    timestamps: false // Indica que não estamos usando os campos 'createdAt' e 'updatedAt'.
+  });
 
-UsuarioModel.init({
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  nome: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  email: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    unique: true
-  },
-  senha: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  unidade: {
-    type: Sequelize.STRING,
-    allowNull: false
-  }
-}, {
-  sequelize,
-  modelName: 'Usuario',
-  freezeTableName: true,
-  timestamps: false
-});
-
-module.exports = UsuarioModel;
+  // Retorna o modelo definido.
+  return Usuario;
+};

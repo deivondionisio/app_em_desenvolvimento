@@ -1,48 +1,54 @@
+require('dotenv').config(); // Assegure-se de ter o pacote 'dotenv' instalado
 const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Usuario = require('../../database/models/user.model'); // Caminho relativo ao diretório atual
+const UsuarioPermissoes = require('../../database/models/usuarioPermissoes.model'); // Exemplo de caminho para o modelo de permissões
+
 const app = express();
-const crypto = require("crypto");
-const SECRET = crypto.randomBytes(64).toString("hex");
-const jwt = require("jsonwebtoken");
+app.use(express.json());
 
-// Importa o modelo de usuários
-const usuarios = require('../../database/models/user.model');
+// Utilize uma variável de ambiente para a SECRET
+const SECRET = process.env.JWT_SECRET;
 
-// Define a rota para /api/login usando o método POST
-app.post('/api/login', async (req, res, next) => {
+app.post('/api/login', async (req, res) => {
   try {
-    const { username, senha } = req.body; // Alterado de email para username
+    const { nome, senha } = req.body; // Utilizando 'nome' como identificador para login
 
-    const usuario = await usuarios.findOne({ where: { nome: username }, include: 'usuarios_permissoes'}); // Alterado de email para nome
+    const usuario = await Usuario.findOne({
+      where: { nome: nome },
+      include: [{
+        model: UsuarioPermissoes,
+        as: 'permissoes' // 'as' deve corresponder ao definido no modelo Sequelize
+      }]
+    });
 
-    if (usuario) {
-      const isSame = await require('bcrypt').compare(senha, usuario.senha);
-      if (isSame) {
-        var token = jwt.sign({ usuario }, SECRET, {
-          expiresIn: 60 * 60 * 24 // expires in 24h
-        });
-        return res.status(200).send({ 
-          auth: true, 
-          token: token, 
-          usuario: {
-            id: usuario.id,
-            nome: usuario.nome,
-            unidade: usuario.unidade,
-            createdAt: usuario.createdAt,
-            updatedAt: usuario.updatedAt
-          }, 
-          message: null 
-        });
-      } else {
-        return res.status(200).send({ auth: false, token: null, usuario: null, message: 'Senha incorreta!' });
+    if (usuario && bcrypt.compareSync(senha, usuario.senha)) {
+      const permissoes = usuario.permissoes.map(p => p.nome_permissao); // Supondo que 'nome_permissao' é o campo de permissões
+
+      // Verifica se o usuário tem a permissão de administrador
+      if (!permissoes.includes('administrador')) {
+        return res.status(403).send({ auth: false, message: 'Acesso negado.' });
       }
-    } else {
-      return res.status(200).send({ auth: false, token: null, usuario: null, message: 'Usuário não registrado!' });
+
+      const token = jwt.sign({ id: usuario.id, permissoes }, SECRET, {
+        expiresIn: 86400 // 24 horas
+      });
+
+      return res.status(200).send({ auth: true, token, usuario: { ...usuario.toJSON(), senha: undefined } }); // Não inclua a senha na resposta
     }
+
+    res.status(401).send({ auth: false, message: 'Nome ou senha incorretos!' });
   } catch (error) {
-    console.log('erro ao entrar', error);
-    return res.status(500).json(error);
+    console.error('Erro ao entrar', error);
+    res.status(500).send('Erro interno do servidor');
   }
 });
 
-// Inicia o servidor
-app.listen(3000);
+// Outras rotas e middlewares...
+
+// Inicia o servidor na porta definida no .env ou na porta 3000 por padrão
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});

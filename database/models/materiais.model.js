@@ -1,59 +1,50 @@
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('../config/database');
+const { Model, DataTypes } = require('sequelize');
 
-class Requisicao extends Model {}
+class Material extends Model {}
 
-Requisicao.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  usuario_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Usuario', 
-      key: 'id'
+module.exports = (sequelize) => {
+  Material.init({
+    // A chave primária 'id' não precisa ser definida, o Sequelize adiciona automaticamente
+    usuario_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'usuarios', // O nome da tabela deve estar em minúsculas
+        key: 'id'
+      }
+    },
+    tipo: {
+      type: DataTypes.STRING(255), // Especificando o comprimento conforme o diagrama
+      allowNull: false
+    },
+    nome: {
+      type: DataTypes.STRING(255), // Especificando o comprimento conforme o diagrama
+      allowNull: false
+    },
+    quantidade_disponivel: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    descricao: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    fabricante: {
+      type: DataTypes.STRING(255), // Especificando o comprimento conforme o diagrama
+      allowNull: false
+    },
+    // A coluna 'data_requisicao' foi removida, pois ela não faz parte do modelo 'Material'
+    // A coluna 'status' foi removida, pois ela não faz parte do modelo 'Material'
+    observacao: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
-  },
-  tipo: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  nome: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  quantidade_disponivel: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  descricao: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  fabricante: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  data_requisicao: {
-    type: DataTypes.DATE,
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  observacao: {
-    type: DataTypes.TEXT,
-    allowNull: true
-  }
-}, {
-  sequelize,
-  modelName: 'Requisicao',
-  freezeTableName: true,
-  timestamps: false
-});
+  }, {
+    sequelize,
+    modelName: 'Material', // Nome do modelo em formato de PascalCase
+    freezeTableName: true, // Impede que o Sequelize pluralize o nome da tabela
+    timestamps: false // Indica que não estamos usando os campos 'createdAt' e 'updatedAt'
+  });
 
-module.exports = Requisicao;
+  return Material;
+};
