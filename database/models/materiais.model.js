@@ -1,12 +1,9 @@
-const Sequelize = require('sequelize');
-const DataTypes = require('sequelize').DataTypes;
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../config/database');
 
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'postgres'
-});
+class Requisicao extends Model {}
 
-const Requisicao = sequelize.define('Requisicao', {
+Requisicao.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -16,7 +13,7 @@ const Requisicao = sequelize.define('Requisicao', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Usuario',
+      model: 'Usuario', 
       key: 'id'
     }
   },

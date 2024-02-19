@@ -37,30 +37,22 @@ let success = false;
   }
 })();
 
+// Importação e inicialização das models
 const UsuarioModel = require('./models/user.model');
-const RequisicaoModel = require('./models/requisicao.model');
+const RequisicaoModel = require('./models/requisicao.model'); // Certifique-se de ajustar o nome do modelo conforme necessário
 const MaterialModel = require('./models/materiais.model');
 const MaterialRequisicaoModel = require('./models/materiaisrequisicao.model');
 const PermissaoModel = require('./models/permissao.model');
 
-const Usuario = UsuarioModel(sequelize, Sequelize.DataTypes);
-const Requisicao = RequisicaoModel(sequelize, Sequelize.DataTypes);
-const Material = MaterialModel(sequelize, Sequelize.DataTypes);
-const MaterialRequisicao = MaterialRequisicaoModel(sequelize, Sequelize.DataTypes);
-const Permissao = PermissaoModel(sequelize, Sequelize.DataTypes);
+const Usuario = UsuarioModel.init(sequelize, Sequelize.DataTypes);
+const Requisicao = RequisicaoModel.init(sequelize, Sequelize.DataTypes);
+const Material = MaterialModel.init(sequelize, Sequelize.DataTypes);
+const MaterialRequisicao = MaterialRequisicaoModel.init(sequelize, Sequelize.DataTypes);
+const Permissao = PermissaoModel.init(sequelize, Sequelize.DataTypes);
 
-Usuario.hasMany(Requisicao, { foreignKey: 'usuario_id' });
-Requisicao.belongsTo(Usuario, { foreignKey: 'usuario_id' });
+// Associações e outros relacionamentos...
 
-Usuario.belongsToMany(Permissao, { through: 'usuarios_permissoes', foreignKey: 'usuario_id' });
-Permissao.belongsToMany(Usuario, { through: 'usuarios_permissoes', foreignKey: 'permissao_id' });
-
-Requisicao.hasMany(MaterialRequisicao, { foreignKey: 'requisicao_id' });
-MaterialRequisicao.belongsTo(Requisicao, { foreignKey: 'requisicao_id' });
-
-Material.hasMany(MaterialRequisicao, { foreignKey: 'material_id' });
-MaterialRequisicao.belongsTo(Material, { foreignKey: 'material_id' });
-
+// Exportação do objeto db
 db.Usuario = Usuario;
 db.Requisicao = Requisicao;
 db.Material = Material;

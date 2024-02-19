@@ -1,12 +1,15 @@
 const Sequelize = require('sequelize');
-const DataTypes = require('sequelize').DataTypes;
+const { DataTypes } = require('sequelize');
+const config = require('../config/database');
 
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'postgres'
+const sequelize = new Sequelize(config.development.database, config.development.username, config.development.password, {
+  host: config.development.host,
+  dialect: 'postgres',
 });
 
-const Permissao = sequelize.define('Permissao', {
+class PermissaoModel extends Sequelize.Model {}
+
+PermissaoModel.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -28,4 +31,4 @@ const Permissao = sequelize.define('Permissao', {
   timestamps: false
 });
 
-module.exports = Permissao;
+module.exports = PermissaoModel;

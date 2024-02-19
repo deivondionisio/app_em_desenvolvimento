@@ -5,7 +5,7 @@ const SECRET = crypto.randomBytes(64).toString("hex");
 const jwt = require("jsonwebtoken");
 
 // Importa o modelo de usuários
-const usuarios = require('../../models/user.model');
+const usuarios = require('../../database/models/user.model');
 
 // Define a rota para /api/login usando o método POST
 app.post('/api/login', async (req, res, next) => {

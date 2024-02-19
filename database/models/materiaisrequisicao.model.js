@@ -1,12 +1,15 @@
 const Sequelize = require('sequelize');
-const DataTypes = require('sequelize').DataTypes;
+const { DataTypes } = require('sequelize');
+const config = require('../config/database');
 
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'postgres'
+const sequelize = new Sequelize(config.development.database, config.development.username, config.development.password, {
+  host: config.development.host,
+  dialect: 'postgres',
 });
 
-const MaterialRequisicao = sequelize.define('MaterialRequisicao', {
+class MaterialRequisicaoModel extends Sequelize.Model {}
+
+MaterialRequisicaoModel.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -47,4 +50,5 @@ const MaterialRequisicao = sequelize.define('MaterialRequisicao', {
   timestamps: false
 });
 
-module.exports = MaterialRequisicao;
+module.exports = MaterialRequisicaoModel;
+
