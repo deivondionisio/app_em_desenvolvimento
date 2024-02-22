@@ -1,0 +1,19 @@
+<form action="/form-okay" method="POST">
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome"><br>
+    <div id="materials">
+        <label for="material_id[]">Material:</label>
+        <select name="material_id[]" id="material_id[]">
+            <!-- Substitua 'materials' pela sua lista de materiais -->
+            {% for material in materials %}
+                <option value="{{ material.id }}">{{ material.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="quantity[]">Quantidade:</label>
+        <input type="number" id="quantity[]" name="quantity[]" min="1" value="1"><br>
+    </div>
+    <button type="button" onclick="addMaterialField()">Adicionar mais material</button><br>
+    <label for="description">Descrição adicional:</label>
+    <textarea id="description" name="description" rows="4" cols="50"></textarea><br>
+    <input type="submit" value="Solicitar Material">
+</form>

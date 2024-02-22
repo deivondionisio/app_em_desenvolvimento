@@ -1,0 +1,18 @@
+<h1>Lista de Pedidos para Aprovação</h1>
+
+<ul class="lista-pedidos">
+    {{#each pedidos}}
+    <li class="pedido">
+        <div class="pedido-info">
+            <h2>{{this.funcionario}}</h2>
+            <p>Data do Pedido: {{this.dataPedido}}</p>
+        </div>
+        <div class="detalhes-link">
+            <a href="/action-panel/requested-order-approver/order-details-requested/:idPedido">
+                <img src="/caminho-para-o-icone/ver-detalhes.png" alt="Ver Detalhes">
+            </a>
+        </div>
+    </li>
+    {{/each}}
+</ul>
+

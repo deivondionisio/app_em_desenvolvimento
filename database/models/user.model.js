@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
       unique: true
     },
     senha: {
-      type: DataTypes.STRING, // Não especifica o comprimento, ajuste conforme necessário.
+      type: DataTypes.STRING, // Não especifica o comprimento, 
       allowNull: false
     },
     unidade: {
