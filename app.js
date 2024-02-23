@@ -1,23 +1,33 @@
 require('dotenv').config();
 const express = require('express');
+const passport = require('passport');
 const { engine } = require('express-handlebars');
 const Sequelize = require('sequelize');
 const app = express();
+const path = require('path');
 const port = process.env.APP_PORT;
 const session = require("express-session")
 const flash = require("connect-flash")
 
-//Configurar Sessão
+// Configuração do diretório de views
+app.use(express.static(path.join(__dirname,"assets")));
+
+//Configuração Autenticação
+require("./config/auth")(passport)
+
+// Configuração da sessão
 app.use(session({
-  secret:"Sm4rtM4nuf4ctur1ng",
+  secret: process.env.JWT_SECRET, // Usa a chave secreta do .env para a sessão
   resave: true,
   saveUninitialized: true
-}))
+}));
 
-app.use(flash())
+// Inicialização do Passport
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
-//Middleware
-
+// Middleware para mensagens flash
 app.use((req, res, next) => {
   console.log("Middleware de flash message");
   res.locals.success_msg = req.flash("success_msg");
@@ -25,15 +35,12 @@ app.use((req, res, next) => {
   next(); 
 });
 
-
 // Configuração do Handlebars
 app.engine('handlebars', engine({
   defaultLayout: 'main'
 }));
 app.set('view engine', 'handlebars');
 app.set('views', './views');
-
-
 
 // Middleware para processar dados de formulário
 app.use(express.urlencoded({ extended: true }));

@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Rota para exibir o formulário de login
 router.get('/', function(req, res) {
-    res.render('login');
+    res.render('usuarios/login');
 });
 
 module.exports = router;

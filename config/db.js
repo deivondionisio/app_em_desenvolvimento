@@ -1,29 +1,15 @@
-require('dotenv').config(); // Importa as variáveis de ambiente do arquivo .env
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+const Sequelize = require('sequelize'); 
+const dbConfig = require('./database'); 
 
-const { Pool } = require('pg');
-
-// Configurações para conectar ao banco de dados
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect:'postgres'
 });
 
-module.exports = pool;
-
-
-/* Exemplo de SELECT
-pool.query('SELECT * FROM materiais', (error, result) => {
-  if (error) {
-    console.error('Erro ao executar a consulta:', error);
-  } else {
-    console.log('Resultados da consulta:', result.rows);
-  }
-
-  // Fecha a conexão com o banco de dados
-  pool.end();
-});
-
-*/
+module.exports = {
+    Sequelize: Sequelize,
+    sequelize: sequelize
+}
