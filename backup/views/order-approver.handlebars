@@ -1,0 +1,33 @@
+<h1>Detalhes do Pedido</h1>
+
+{{#each pedidos}}
+    <div class="pedido">
+        <h2>Pedido feito por: {{this.funcionario}}</h2>
+        <p>Data do Pedido: {{this.dataPedido}}</p>
+
+        <h3>Itens Solicitados:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Quantidade</th>
+                    <th>Observações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each this.itens}}
+                <tr>
+                    <td>{{this.nome}}</td>
+                    <td>{{this.quantidade}}</td>
+                    <td>{{this.observacao}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <button type="button" onclick="aprovarPedido('{{this.idPedido}}')">Aprovar</button>
+        <button type="button" onclick="rejeitarPedido('{{this.idPedido}}')">Rejeitar</button>
+    </div>
+{{/each}}
+
+<!-- Adicionar um link ou botão para retornar à página anterior -->
+<a href="/action-panel/requested-order-approver">Voltar</a>
