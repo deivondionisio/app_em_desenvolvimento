@@ -1,5 +1,10 @@
-// Importar o Express
+// Importar o Express e Sequelize
 const express = require('express');
+const { Op } = require('sequelize');
+
+// Importar o modelo Material
+const Material = require('../../database/models/materiais.model');
+
 // Criar uma instância do Router
 const router = express.Router();
 
@@ -12,23 +17,29 @@ router.get('/action-panel/form-request-materials', function(req, res) {
     res.render('form-request-materials');
 });
 
-// Rota para receber os dados do formulário
-router.post('/form-okay', function(req, res) {
-    // O nome do usuário
-    const nome = req.body.nome; // Ajuste para capturar o campo 'nome' do formulário
+// Rota para pesquisar por nome com busca insensível a maiúsculas e minúsculas
+router.post('/api/search', async (req, res) => {
+    const { searchTerm, searchType } = req.body;
+    let condition = {};
 
-    // Garantir que os IDs dos materiais sejam sempre tratados como um array
-    let material_ids = req.body['material_id[]'];
-    if (!Array.isArray(material_ids)) {
-        material_ids = material_ids ? [material_ids] : [];
+    if (searchType === 'ID' && !isNaN(searchTerm)) {
+        condition.id = searchTerm;
+    } else if (searchType === 'NOME') {
+        condition.nome = { [Op.iLike]: `%${searchTerm}%` };
+    } else {
+        return res.status(400).send("Tipo de pesquisa inválido.");
     }
 
-    // Enviar uma resposta
-    const responseMessage = material_ids.length > 0
-        ? "Nome: " + nome + " - IDs dos Materiais: " + material_ids.join(', ')
-        : "Nome: " + nome + " - Nenhum material selecionado.";
-
-    res.send(responseMessage);
+    try {
+        const results = await Material.findAll({
+            attributes: ['id', 'nome', 'quantidade_disponivel'],
+            where: condition
+        });
+        res.json(results);
+    } catch (error) {
+        console.error('Search Error:', error);
+        res.status(500).send("Erro ao processar a busca");
+    }
 });
 
 // Exportar o router

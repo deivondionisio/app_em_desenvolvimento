@@ -1,0 +1,68 @@
+<div class="container mt-3">
+    <h2>Produtos</h2>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Buscar por nome, descrição ou SKU">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="searchButton">Buscar</button>
+        </div>
+    </div>
+
+    <div id="productList" class="w-100"></div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', buscarMateriais);
+
+function buscarMateriais() {
+    const searchInput = document.getElementById('searchInput');
+    const productList = document.getElementById('productList');
+    const termoBusca = searchInput.value.trim();
+
+    if (termoBusca.length < 3) {
+        productList.innerHTML = ''; // Também limpa os resultados se não houver caracteres suficientes
+        return;
+    }
+
+    const hasLetters = /[a-zA-Z]/.test(termoBusca);
+    const hasNumbers = /\d/.test(termoBusca);
+
+    if (hasLetters && hasNumbers) {
+        alert("Digite apenas letras para o nome ou apenas números para o ID.");
+        setTimeout(() => {
+            searchInput.value = ''; // Limpa o campo após o alerta
+            productList.innerHTML = ''; // Limpa os resultados da pesquisa
+        }, 1);
+        return;
+    }
+
+    const searchType = hasNumbers ? 'ID' : 'NOME';
+
+    fetch(`/api/search`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ searchTerm: termoBusca, searchType })
+    })
+    .then(response => response.json())
+    .then(materiais => {
+        const productList = document.getElementById('productList');
+        productList.innerHTML = '';
+        materiais.forEach(material => {
+            productList.innerHTML += `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="p-2">
+                        ID: ${material.id}, ${material.nome} - Disponíveis: ${material.quantidade_disponivel}
+                    </div>
+                    <button class="btn btn-primary">+</button>
+                </div>
+            `;
+        });
+    })
+    .catch(error => {
+        console.error('Erro ao buscar materiais:', error);
+    });
+}
+
+
+</script>

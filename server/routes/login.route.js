@@ -1,11 +1,21 @@
-// login.route.js
-
 const express = require('express');
 const router = express.Router();
+const passport = require("passport")
 
-// Rota para exibir o formulário de login
+
 router.get('/', function(req, res) {
-    res.render('usuarios/login');
+    res.render('login');
 });
+
+router.post("/", ((req, res, next) => {
+    passport.authenticate("local", {
+        successRedirect:"/action-panel",
+        failureRedirect:"/falhaLogin",
+        failureFlash:true
+    })(req, res, next)
+}))
+
+
+
 
 module.exports = router;
